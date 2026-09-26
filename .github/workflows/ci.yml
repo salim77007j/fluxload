@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.98
         with:
           components: clippy, rustfmt
 
@@ -66,7 +66,7 @@ jobs:
           sudo apt-get install -y libxkbcommon-dev libwayland-dev libx11-dev libxkbcommon-x11-dev libasound2-dev libudev-dev
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.98
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
@@ -105,7 +105,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.98
 
       - name: Install NASM (aws-lc-sys requirement)
         run: choco install -y nasm
