@@ -47,8 +47,7 @@ impl TaskStatus {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum TaskKind {
     #[default]
     Http,
@@ -261,4 +260,3 @@ pub struct StoredTask {
     #[serde(default)]
     pub origin: Option<String>,
 }
-

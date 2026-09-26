@@ -93,6 +93,7 @@ impl GapQueue {
         self.gaps.lock().expect("gap queue").push(range);
     }
 
+    #[allow(dead_code)] // used by tests and external tooling
     pub fn remaining_bytes(&self) -> u64 {
         self.gaps
             .lock()
@@ -143,8 +144,8 @@ async fn backoff(
     retry: u32,
     base_ms: u64,
 ) -> Option<WorkerOut> {
-    let exp = base_ms.saturating_mul(1u64 << retry.min(5).max(1));
-    let ms = exp.min(30_000).max(50);
+    let exp = base_ms.saturating_mul(1u64 << retry.clamp(1, 5));
+    let ms = exp.clamp(50, 30_000);
     tokio::select! {
         _ = tokio::time::sleep(Duration::from_millis(ms)) => None,
         _ = ctrl.changed() => match *ctrl.borrow() {

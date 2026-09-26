@@ -16,6 +16,7 @@ fn temp_dir(tag: &str) -> PathBuf {
     d
 }
 
+#[allow(clippy::field_reassign_with_default)] // staged config setup reads top-down
 fn make_config(tag: &str, tls_insecure: bool) -> (EngineConfig, PathBuf, PathBuf) {
     let dir = temp_dir(tag);
     let dl = dir.join("downloads");

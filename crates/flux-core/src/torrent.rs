@@ -278,6 +278,7 @@ pub(crate) fn torrent_progress(entry: &Arc<TaskEntry>) -> Option<u64> {
 
 impl TaskShared {
     /// Keep net accounting consistent for torrent tasks.
+    #[allow(dead_code)] // reserved for swarm stats integration
     pub fn note_torrent_bytes(&self, n: u64) {
         self.net_bytes.store(n, Ordering::Relaxed);
     }

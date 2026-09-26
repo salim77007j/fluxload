@@ -14,7 +14,6 @@ pub enum CacheMode {
     Manual { budget_mb: u64 },
 }
 
-
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(default)]
 pub struct RamCacheConfig {
@@ -204,6 +203,7 @@ pub fn atomic_write(path: PathBuf, data: Vec<u8>) -> std::io::Result<()> {
 }
 
 #[cfg(test)]
+#[allow(clippy::field_reassign_with_default)] // staged config setup reads top-down
 mod tests {
     use super::*;
 

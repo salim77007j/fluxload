@@ -206,6 +206,7 @@ fn draw_bar(frac: f32, width: usize) -> String {
     out
 }
 
+#[allow(clippy::too_many_arguments)] // CLI flag surface; grouped struct would obscure usage
 fn cmd_download(
     url: &str,
     output: Option<&str>,

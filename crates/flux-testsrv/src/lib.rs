@@ -266,15 +266,12 @@ async fn serve_file(
         }
     }
 
-    let (status, (start, end)) = match (
-        range_header.is_some() && !ignore_range,
-        range,
-        range_valid,
-    ) {
+    let (status, (start, end)) = match (range_header.is_some() && !ignore_range, range, range_valid)
+    {
         (true, Some(r), true) => (StatusCode::PARTIAL_CONTENT, r),
         // Content changed or ranges unsupported: 200 with the full body.
         _ => (StatusCode::OK, (0, size.saturating_sub(1))),
-        };
+    };
 
     let length = if size == 0 { 0 } else { end - start + 1 };
     let mut builder = Response::builder()

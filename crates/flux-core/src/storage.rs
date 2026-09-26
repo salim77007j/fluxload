@@ -315,6 +315,9 @@ impl PartialFile {
             .read(true)
             .write(true)
             .create(true)
+            // Never truncate: a partial file's existing bytes ARE the resume
+            // state. Setting truncate(true) would destroy crash recovery.
+            .truncate(false)
             .open(&part_path)
             .map_err(|e| {
                 FluxError::Disk(format!(

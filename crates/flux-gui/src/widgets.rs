@@ -308,8 +308,8 @@ pub fn sparkline(ui: &mut Ui, history: &[(i64, u64)], width: f32, height: f32, p
         .iter()
         .enumerate()
         .map(|(i, (_, v))| {
-            let x = rect.left() + 3.0
-                + i as f32 / (history.len() as f32 - 1.0) * (rect.width() - 6.0);
+            let x =
+                rect.left() + 3.0 + i as f32 / (history.len() as f32 - 1.0) * (rect.width() - 6.0);
             let y = rect.bottom() - 3.0 - (*v as f32 / max as f32).min(1.0) * (rect.height() - 6.0);
             Pos2::new(x, y)
         })

@@ -338,11 +338,7 @@ impl FluxloadApp {
                         egui::RichText::new("＋ Add download")
                             .font(theme::font_body())
                             .strong()
-                            .color(if can_add {
-                                egui::Color32::WHITE
-                            } else {
-                                p.sub
-                            }),
+                            .color(if can_add { egui::Color32::WHITE } else { p.sub }),
                     )
                     .fill(if can_add { p.accent } else { p.surface_alt });
                     if ui.add_enabled(can_add, add_btn).clicked() {
@@ -391,7 +387,6 @@ impl FluxloadApp {
             }
         });
     }
-
 
     fn add_from_input(&mut self) {
         let url = self.url_input.trim().to_string();
@@ -446,18 +441,16 @@ impl FluxloadApp {
                 ] {
                     let selected = self.filter == f;
                     let text = format!("{label} · {n}");
-                    let btn = egui::Button::new(
-                        if selected {
-                            egui::RichText::new(text)
-                                .font(theme::font_small())
-                                .color(egui::Color32::WHITE)
-                                .strong()
-                        } else {
-                            egui::RichText::new(text)
-                                .font(theme::font_small())
-                                .color(p.sub)
-                        },
-                    )
+                    let btn = egui::Button::new(if selected {
+                        egui::RichText::new(text)
+                            .font(theme::font_small())
+                            .color(egui::Color32::WHITE)
+                            .strong()
+                    } else {
+                        egui::RichText::new(text)
+                            .font(theme::font_small())
+                            .color(p.sub)
+                    })
                     .fill(if selected { p.accent } else { p.bg });
                     if ui.add(btn).clicked() {
                         self.filter = f;

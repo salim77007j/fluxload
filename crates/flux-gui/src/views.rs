@@ -216,7 +216,7 @@ fn truncate(painter: &Painter, text: &str, font: egui::FontId, max_w: f32) -> St
     let mut lo = 0usize; // fits(lo) is true ("…" alone always fits).
     let mut hi = chars.len();
     while lo < hi {
-        let mid = (lo + hi + 1) / 2;
+        let mid = (lo + hi).div_ceil(2);
         if fits(mid) {
             lo = mid;
         } else {
@@ -237,10 +237,7 @@ pub fn empty_state(ui: &mut Ui, p: Palette, no_tasks: bool) {
     let gc = Pos2::new(center.x, center.y - 36.0);
     painter.circle_filled(gc, 34.0, p.surface_alt);
     painter.line_segment(
-        [
-            Pos2::new(gc.x, gc.y - 15.0),
-            Pos2::new(gc.x, gc.y + 8.0),
-        ],
+        [Pos2::new(gc.x, gc.y - 15.0), Pos2::new(gc.x, gc.y + 8.0)],
         Stroke::new(3.5, p.sub),
     );
     let head = [
@@ -248,14 +245,8 @@ pub fn empty_state(ui: &mut Ui, p: Palette, no_tasks: bool) {
         Pos2::new(gc.x, gc.y + 10.0),
         Pos2::new(gc.x + 10.0, gc.y - 1.0),
     ];
-    painter.line_segment(
-        [head[0], head[1]],
-        Stroke::new(3.5, p.sub),
-    );
-    painter.line_segment(
-        [head[1], head[2]],
-        Stroke::new(3.5, p.sub),
-    );
+    painter.line_segment([head[0], head[1]], Stroke::new(3.5, p.sub));
+    painter.line_segment([head[1], head[2]], Stroke::new(3.5, p.sub));
     painter.line_segment(
         [
             Pos2::new(gc.x - 15.0, gc.y + 19.0),
@@ -365,12 +356,7 @@ pub fn task_details(
                 .unwrap_or_else(|| "unknown".into()),
             p,
         );
-        stat_block(
-            &mut cols[2],
-            "Avg speed",
-            &ffmt::fmt_speed(t.avg_bps),
-            p,
-        );
+        stat_block(&mut cols[2], "Avg speed", &ffmt::fmt_speed(t.avg_bps), p);
     });
 
     ui.add_space(8.0);

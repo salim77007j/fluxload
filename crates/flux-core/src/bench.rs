@@ -43,6 +43,7 @@ pub fn run_bench(url: &str, connections: &[u32], per_run_timeout: Duration) -> R
     })
 }
 
+#[allow(clippy::field_reassign_with_default)] // staged config setup reads top-down
 fn bench_once(url: &str, n: u32, dir: &std::path::Path, timeout: Duration) -> BenchRow {
     let mut cfg = crate::config::EngineConfig::default();
     cfg.data_dir = dir.join("data");

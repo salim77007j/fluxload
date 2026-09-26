@@ -9,6 +9,7 @@
 //! Requires the `torrent` feature (default) and the test server tracker.
 
 #![cfg(feature = "torrent")]
+#![allow(unused_assignments, clippy::field_reassign_with_default)]
 
 use flux_core::config::EngineConfig;
 use flux_core::engine::{Engine, EngineEvent};
@@ -37,10 +38,6 @@ fn sha256_of(path: &std::path::Path) -> String {
     }
     let out: [u8; 32] = h.finalize().into();
     out.iter().map(|b| format!("{b:02x}")).collect()
-}
-
-fn hex20(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -107,12 +104,13 @@ async fn magnet_download_from_local_swarm() {
     tracing::info!("seeder ready: info hash {info_hash_hex}");
 
     // Give the seeder a moment to verify + announce.
-    tokio::time::sleep(Duration::from_secs(2));
+    tokio::time::sleep(Duration::from_secs(2)).await;
 
     // --- Engine (leecher) receives the magnet -------------------------------
     let dir = temp_dir("leech");
     let dl = dir.join("downloads");
     std::fs::create_dir_all(&dl).unwrap();
+    #[allow(clippy::field_reassign_with_default)]
     let mut cfg = EngineConfig::default();
     cfg.data_dir = dir.join("data");
     cfg.download_dir = dl.clone();

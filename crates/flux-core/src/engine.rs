@@ -460,9 +460,9 @@ async fn engine_main(
     // Graceful shutdown: stop workers, persist state.
     for entry in engine.tasks.values() {
         entry.shared.ctrl.send_replace(Ctrl::Stop);
-        let _ = entry.join.lock().expect("join").take().map(|h| {
-            let _ = h;
-        });
+        if let Some(h) = entry.join.lock().expect("join").take() {
+            std::mem::drop(h);
+        }
         ctx.persist_task(entry);
     }
     let _ = ctx.events.send(EngineEvent::Stopped);

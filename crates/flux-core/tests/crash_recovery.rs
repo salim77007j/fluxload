@@ -2,6 +2,8 @@
 //! then a fresh engine resumes from the durable partial state and must finish
 //! with byte-exact integrity.
 
+#![allow(unused_assignments, clippy::field_reassign_with_default)]
+
 use flux_core::config::EngineConfig;
 use flux_core::engine::{Engine, EngineEvent};
 use flux_core::task::{AddRequest, TaskStatus};
