@@ -1,0 +1,64 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/flux-core",
+    "crates/flux-cli",
+    "crates/flux-gui",
+    "crates/flux-testsrv",
+]
+
+[workspace.package]
+version = "1.0.0-beta.1"
+edition = "2021"
+rust-version = "1.85"
+
+[workspace.dependencies]
+flux-core = { path = "crates/flux-core" }
+flux-testsrv = { path = "crates/flux-testsrv" }
+
+tokio = { version = "1.53", features = [
+    "rt", "rt-multi-thread", "macros", "time", "sync", "fs", "io-util", "net", "signal",
+] }
+reqwest = { version = "0.13.5", features = ["stream", "socks", "http3"] }
+bytes = "1.12"
+futures-util = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+sha2 = "0.11"
+hex = "0.4"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+dirs = "7"
+chrono = { version = "0.4", features = ["serde", "clock"] }
+sysinfo = "0.39"
+clap = { version = "4", features = ["derive"] }
+eframe = "0.36"
+image = { version = "0.25", default-features = false, features = ["png"] }
+ring = "0.17"
+base64 = "0.23"
+librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"] }
+axum = "0.8"
+rcgen = "0.14"
+h3 = "0.0.8"
+h3-quinn = "0.0.10"
+http = "1"
+quinn = "0.11"
+
+[profile.dev]
+# Keep backtraces useful without multi-GB artifacts on constrained machines.
+debug = 0
+
+[profile.test]
+debug = 0
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+panic = "unwind"
+
+[profile.release.package."*"]
+# keep symbols for release binaries to aid crash diagnostics
+strip = "none"

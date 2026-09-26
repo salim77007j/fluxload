@@ -1,0 +1,38 @@
+[package]
+name = "flux-testsrv"
+description = "Local test server for Fluxload integration tests (range requests, throttling, HTTP tracker, HTTP/3)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file = "../../LICENSE"
+
+[features]
+default = ["h3"]
+h3 = ["dep:quinn", "dep:h3", "dep:h3-quinn", "dep:rcgen", "dep:http"]
+
+[lib]
+name = "flux_testsrv"
+path = "src/lib.rs"
+
+[[bin]]
+name = "flux-testsrv"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { workspace = true }
+axum = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+bytes = { workspace = true }
+futures-util = { workspace = true }
+uuid = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+anyhow = { workspace = true }
+quinn = { workspace = true, optional = true }
+h3 = { version = "0.0.8", optional = true }
+h3-quinn = { version = "0.0.10", optional = true }
+rcgen = { workspace = true, optional = true }
+http = { version = "1", optional = true }

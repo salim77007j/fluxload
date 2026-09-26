@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: --cfg reqwest_unstable
+
+jobs:
+  test:
+    name: Test (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+
+      - name: Format check
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Unit tests
+        run: cargo test --workspace --release --lib --bins
+
+      - name: Engine integration tests (real downloads)
+        run: cargo test --release --test '*' -p flux-core
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-linux
+          path: |
+            target/release/**/*.log
+          if-no-files-found: ignore
+
+  build-linux:
+    name: Build Linux (glibc x86_64)
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system deps (GUI)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-dev libwayland-dev libx11-dev libxkbcommon-x11-dev libasound2-dev libudev-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+
+      - name: Build release binaries
+        run: cargo build --release --workspace
+
+      - name: Smoke test CLI
+        run: |
+          ./target/release/flux --version
+          ./target/release/fluxload --help || true
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p dist/linux
+          cp target/release/flux dist/linux/
+          cp target/release/fluxload dist/linux/
+          strip dist/linux/flux dist/linux/fluxload || true
+          cd dist/linux && sha256sum flux fluxload > SHA256SUMS.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxload-linux-x64
+          path: dist/linux/
+
+  build-windows:
+    name: Build Windows (x86_64-msvc)
+    runs-on: windows-latest
+    needs: test
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+
+      - name: Build release binaries
+        run: cargo build --release --workspace
+        env:
+          # reqwest http3 feature gate
+          RUSTFLAGS: --cfg reqwest_unstable
+
+      - name: Smoke test CLI
+        run: |
+          target\release\flux.exe --version
+          target\release\fluxload.exe --help || true
+
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist\windows
+          Copy-Item target\release\flux.exe dist\windows\
+          Copy-Item target\release\fluxload.exe dist\windows\
+          $hashes = Get-FileHash dist\windows\flux.exe, dist\windows\fluxload.exe -Algorithm SHA256
+          $hashes | ForEach-Object { "$($_.Hash)  $([IO.Path]::GetFileName($_.Path))" } | Out-File dist\windows\SHA256SUMS.txt -Encoding ascii
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxload-windows-x64
+          path: dist/windows/
