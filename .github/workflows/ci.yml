@@ -40,7 +40,8 @@ jobs:
         run: cargo test --workspace --release --lib --bins
 
       - name: Engine integration tests (real downloads)
-        run: cargo test --release --test '*' -p flux-core
+        run: |
+          cargo test --release -p flux-core --test engine_http --test crash_recovery --test torrent_swarm
 
       - name: Upload test logs
         if: always()
@@ -106,6 +107,13 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install NASM (aws-lc-sys requirement)
+        run: choco install -y nasm
+
+      - name: Add NASM to PATH
+        shell: pwsh
+        run: echo "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
         with:
@@ -114,9 +122,6 @@ jobs:
 
       - name: Build release binaries
         run: cargo build --release --workspace
-        env:
-          # reqwest http3 feature gate
-          RUSTFLAGS: --cfg reqwest_unstable
 
       - name: Smoke test CLI
         run: |
